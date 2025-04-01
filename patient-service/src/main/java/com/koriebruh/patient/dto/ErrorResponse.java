@@ -1,5 +1,6 @@
 package com.koriebruh.patient.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WebResponse<T> {
+public class ErrorResponse <T> {
 
-    private String status;
-
-    private T data;
+    private T errors;
 
 }
-
-

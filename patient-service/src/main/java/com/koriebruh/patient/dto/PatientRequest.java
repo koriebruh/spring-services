@@ -24,6 +24,6 @@ public class PatientRequest {
     @NotBlank(message = "date of birth can't be null")
     private String dateOfBirth;
 
-    @NotBlank(message = "gender can't be null false for man , true for girl")
+    @NotBlank(message = "gender can't be null")
     private String gender;
 }
