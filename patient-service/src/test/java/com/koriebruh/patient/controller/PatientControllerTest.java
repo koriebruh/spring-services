@@ -11,6 +11,8 @@ import com.koriebruh.patient.service.PatientService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,8 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -28,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class PatientControllerTest {
 
+    private static final Logger log = LoggerFactory.getLogger(PatientControllerTest.class);
     @Autowired
     private MockMvc mockMvc;
 
@@ -37,6 +42,8 @@ class PatientControllerTest {
     private ObjectMapper objectMapper;
     @Autowired
     private PatientService patientService;
+
+    private static final Logger logger = LoggerFactory.getLogger(PatientControllerTest.class);
 
     @BeforeEach
     void setUp() {
@@ -176,6 +183,8 @@ class PatientControllerTest {
 
     /*
      * GET PATIENTS BY ID
+     * - GetPatientsByIdSuccess
+     * - GetPatientsByIdFail
      * */
     @Test
     void testGetPatientsByIdSuccess() throws Exception {
@@ -196,7 +205,8 @@ class PatientControllerTest {
                 status().isOk()
         ).andDo(
                 result -> {
-                    WebResponse<List<PatientResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+                    WebResponse<List<PatientResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponse<List<PatientResponse>>>() {
                     });
                     int lengthPatients = response.getData().size();
                     Assertions.assertEquals(1, lengthPatients);
@@ -204,7 +214,7 @@ class PatientControllerTest {
 
 
                     //GET BY ID
-                    Long patientId = response.getData().get(0).getId();
+                    Long patientId = response.getData().getLast().getId();
                     mockMvc.perform(
                             get("/api/patients/" + patientId)
                                     .accept(MediaType.APPLICATION_JSON)
@@ -213,16 +223,253 @@ class PatientControllerTest {
                             status().isOk()
                     ).andDo(
                             resultById -> {
-                                WebResponse<List<PatientResponse>> responseById = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+                                WebResponse<PatientResponse> responseById = objectMapper.readValue(resultById.getResponse().getContentAsString(),
+                                        new TypeReference<WebResponse<PatientResponse>>() {
                                 });
                                 Assertions.assertEquals("OK", responseById.getStatus());
-                                Assertions.assertEquals(patientId, responseById.getData().getLast().getId());
+                                Assertions.assertNotNull(responseById.getData());
+                                Assertions.assertEquals(patientId, responseById.getData().getId());
                             }
                     );
                 }
         );
-
-
     }
+
+    @Test
+    void testGetPatientsByIdFail() throws Exception {
+        mockMvc.perform(
+                get("/api/patients/999")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andDo(
+                result -> {
+                    ErrorResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+                    });
+
+                    Assertions.assertNotNull(response.getErrors());
+                }
+        );
+    }
+
+
+    /*
+    * DO UPDATE
+    * - testUpdatePatientSuccess
+    * - testGetPatientsUpdateFailIdNotFound
+    * - testGetPatientsUpdateFailCorrupt
+    * */
+
+    @Test
+    void testGetPatientsUpdateSuccess() throws Exception {
+        PatientRequest request = new PatientRequest();
+        request.setName("testbg");
+        request.setEmail("testbg@gmail.com");
+        request.setDateOfBirth("12-20-2003");
+        request.setGender("MAN");
+        request.setAddress("JALAN BARU JADI");
+
+        patientService.createPatient(request);
+
+        mockMvc.perform(
+                get("/api/patients")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(
+                result -> {
+                    WebResponse<List<PatientResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponse<List<PatientResponse>>>() {
+                            });
+                    int lengthPatients = response.getData().size();
+                    Assertions.assertEquals(1, lengthPatients);
+                    Assertions.assertEquals("OK", response.getStatus());
+
+
+                    //do update
+                    PatientRequest requestUpdate = new PatientRequest();
+                    requestUpdate.setName("testbg");
+                    requestUpdate.setEmail("update@gmail.com");
+                    requestUpdate.setDateOfBirth("13-02-2006");
+                    requestUpdate.setGender("girl");
+                    requestUpdate.setAddress("JALAN BARU JADI");
+
+                    Long patientId = response.getData().getLast().getId();
+                    mockMvc.perform(
+                            put("/api/patients/" + patientId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request))
+                    ).andExpect(
+                            status().isOk()
+                    ).andDo(
+                            resultById -> {
+                                WebResponse<String> responseById = objectMapper.readValue(resultById.getResponse().getContentAsString(),
+                                        new TypeReference<WebResponse<String>>() {
+                                        });
+                                Assertions.assertEquals("UPDATED", responseById.getStatus());
+                                Assertions.assertNotEquals(response.getData().getLast().getEmail(), requestUpdate.getEmail());
+                                Assertions.assertNotEquals(response.getData().getLast().getDateOfBirth(), requestUpdate.getDateOfBirth());
+                            }
+                    );
+                }
+        );
+    }
+
+    @Test
+    void testGetPatientsUpdateFailIdNotFound() throws Exception {
+        PatientRequest request = new PatientRequest();
+        request.setName("testbg");
+        request.setEmail("testbg@gmail.com");
+        request.setDateOfBirth("12-20-2003");
+        request.setGender("MAN");
+        request.setAddress("JALAN BARU JADI");
+
+        patientService.createPatient(request);
+
+        long wrongId = 99999L;
+        mockMvc.perform(
+                put("/api/patients/" + wrongId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        ).andExpect(
+                status().isNotFound()
+        ).andDo(
+                resultById -> {
+                    ErrorResponse<String> responseById = objectMapper.readValue(resultById.getResponse().getContentAsString(),
+                            new TypeReference<ErrorResponse<String>>() {
+                            });
+                    Assertions.assertNotNull(responseById.getErrors());
+                }
+        );
+    }
+
+    @Test
+    void testGetPatientsUpdateFailCorrupt() throws Exception {
+        PatientRequest request = new PatientRequest();
+        request.setName("testbg");
+        request.setEmail("testbg@gmail.com");
+        request.setDateOfBirth("12-20-2003");
+        request.setGender("MAN");
+        request.setAddress("JALAN BARU JADI");
+
+        patientService.createPatient(request);
+
+        mockMvc.perform(
+                get("/api/patients")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(
+                result -> {
+                    WebResponse<List<PatientResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponse<List<PatientResponse>>>() {
+                            });
+                    int lengthPatients = response.getData().size();
+                    Assertions.assertEquals(1, lengthPatients);
+                    Assertions.assertEquals("OK", response.getStatus());
+
+
+                    //corupt no require set name
+                    PatientRequest requestUpdate = new PatientRequest();
+                    requestUpdate.setEmail("testbg@gmail.com");
+                    requestUpdate.setDateOfBirth("13-02-2009");
+                    requestUpdate.setGender("grill");
+                    requestUpdate.setAddress("grill jadi baru");
+
+                    Long patientId = response.getData().getLast().getId();
+                    mockMvc.perform(
+                            put("/api/patients/" + patientId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(requestUpdate))
+                    ).andExpect(
+                            status().isBadRequest()
+                    ).andDo(
+                            resultById -> {
+                                ErrorResponse<String> responseById = objectMapper.readValue(resultById.getResponse().getContentAsString(),
+                                        new TypeReference<ErrorResponse<String>>() {
+                                        });
+                                Assertions.assertNotNull(responseById.getErrors());
+                            }
+                    );
+                }
+        );
+    }
+
+    /*
+    * DO DELETE
+    * - testGetPatientsDeleteSuccess
+    * - testDeletePatientFail
+    * */
+    @Test
+    void testGetPatientsDeleteSuccess() throws Exception {
+        PatientRequest request = new PatientRequest();
+        request.setName("testbg");
+        request.setEmail("testbg@gmail.com");
+        request.setDateOfBirth("12-20-2003");
+        request.setGender("MAN");
+        request.setAddress("JALAN BARU JADI");
+
+        patientService.createPatient(request);
+
+        mockMvc.perform(
+                get("/api/patients")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(
+                result -> {
+                    WebResponse<List<PatientResponse>> response = objectMapper.readValue(result.getResponse().getContentAsString(),
+                            new TypeReference<WebResponse<List<PatientResponse>>>() {
+                            });
+                    int lengthPatients = response.getData().size();
+                    Assertions.assertEquals(1, lengthPatients);
+                    Assertions.assertEquals("OK", response.getStatus());
+
+
+                    Long patientId = response.getData().getLast().getId();
+                    mockMvc.perform(
+                            delete("/api/patients/" + patientId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                    ).andExpect(
+                            status().isOk()
+                    ).andDo(
+                            resultById -> {
+                                WebResponse<String> responseById = objectMapper.readValue(resultById.getResponse().getContentAsString(),
+                                        new TypeReference<WebResponse<String>>() {
+                                        });
+                                Assertions.assertEquals("DELETED",responseById.getStatus());
+                            }
+                    );
+                }
+        );
+    }
+
+    @Test
+    void testGetPatientsDeleteFail() throws Exception {
+        Long wrongId = 9999999L;
+        mockMvc.perform(
+                delete("/api/patients/" + wrongId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andDo(
+                resultById -> {
+                    ErrorResponse<String> responseById = objectMapper.readValue(resultById.getResponse().getContentAsString(),
+                            new TypeReference<ErrorResponse<String>>() {
+                            });
+                    Assertions.assertNotNull(responseById.getErrors());
+                }
+        );
+    }
+
 
 }
