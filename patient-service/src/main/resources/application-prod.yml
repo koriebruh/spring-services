@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: patient-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres:5432/patient_service}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      connection-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+server:
+  port: 8080
+
+info:
+  app:
+    name: Patient Service
+    description: Aplikasi monitoring layanan pasien
+    version: 1.0.0
+  author: koriebruh (JAMAL)
+  website: https://github.com/koriebruh
+  java:
+    version: ${java.version}
+    vendor: ${java.vendor}
+    vm:
+      name: ${java.vm.name}
+      version: ${java.vm.version}
+    runtime:
+      name: ${java.runtime.name}
+  os:
+    name: ${os.name}
+    arch: ${os.arch}
+    version: ${os.version}
+  spring:
+    version: ${spring.boot.version}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    env:
+      show-values: never
+    configprops:
+      show-values: never
+  info:
+    env:
+      enabled: false

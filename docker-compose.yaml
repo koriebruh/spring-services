@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres-patient-service
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: korie123
+      POSTGRES_DB: patient_service
+    ports:
+      - "5555:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - spring-services
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  patient-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
+    container_name: patient-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_USER: postgres
+      DB_PASS: korie123
+      DB_URL: jdbc:postgresql://postgres:5432/patient_service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - spring-services
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+networks:
+  spring-services:
+    driver: bridge
