@@ -1,0 +1,24 @@
+### testing
+GET http://localhost:8081/api/billing
+Content-Type: application/json
+
+### testing
+POST http://localhost:8081/api/billing
+Content-Type: application/json
+Accept: application/json
+
+{
+  "patientId": 1,
+  "name": "jamal",
+  "email": "jamal@gmail.com"
+}
+
+###
+GRPC localhost:9091/BillingService/CreateBillingAccount
+Content-Type: application/json
+
+{
+  "patientId": 1,
+  "name": "jamal",
+  "email": "jamal@gmail.com"
+}

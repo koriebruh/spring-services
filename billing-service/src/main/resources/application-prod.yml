@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: billing-service
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  port: 8081
+  shutdown: graceful
+
+grpc:
+  server:
+    port: 9091
+
+info:
+  app:
+    name: Billing Service
+    version: 1.0.0
+  author: koriebruh (JAMAL)
+  website: https://github.com/koriebruh
+  java:
+    version: ${java.version}
+    vendor: ${java.vendor}
+    vm:
+      name: ${java.vm.name}
+      version: ${java.vm.version}
+    runtime:
+      name: ${java.runtime.name}
+  os:
+    name: ${os.name}
+    arch: ${os.arch}
+    version: ${os.version}
+  spring:
+    version: ${spring.boot.version}
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    env:
+      show-values: never
+    configprops:
+      show-values: never
+  info:
+    env:
+      enabled: false
