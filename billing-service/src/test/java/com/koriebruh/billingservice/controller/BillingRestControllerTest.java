@@ -8,30 +8,26 @@ import com.koriebruh.billingservice.dto.ErrorResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;  // Import yang benar
 
-@SpringBootTest
-@AutoConfigureMockMvc
+/**
+ * @author Korie Bruh
+ * @version 1.0
+ * @since 2025-05-04
+ */
+
+@WebMvcTest(BillingRestController.class)
 class BillingRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private static final Logger logger = LoggerFactory.getLogger(BillingRestControllerTest.class);
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void testCreateBillingSuccess() throws Exception {
@@ -47,13 +43,10 @@ class BillingRestControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 ).andExpect(status().isCreated())
                 .andDo(result -> {
-
-                    BillingResponseDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-                    });
+                    BillingResponseDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
                     Assertions.assertEquals("ACTIVE", response.getStatus());
                 });
     }
-
 
     @Test
     void testCreateBillingNotIncludeEmail() throws Exception {
@@ -68,9 +61,7 @@ class BillingRestControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 ).andExpect(status().isBadRequest())
                 .andDo(result -> {
-
-                    ErrorResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-                    });
+                    ErrorResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
                     Assertions.assertNotNull(response.getErrors());
                 });
     }
@@ -81,7 +72,6 @@ class BillingRestControllerTest {
         request.setName("Nathyov");
         request.setEmail("Nathyow@gmail.com");
 
-
         mockMvc.perform(
                         post("/api/billing")
                                 .accept(MediaType.APPLICATION_JSON)
@@ -89,9 +79,7 @@ class BillingRestControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 ).andExpect(status().isBadRequest())
                 .andDo(result -> {
-
-                    ErrorResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-                    });
+                    ErrorResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
                     Assertions.assertNotNull(response.getErrors());
                 });
     }

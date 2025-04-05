@@ -5,14 +5,21 @@ import billing.BillingResponse;
 import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+/**
+ * @author Korie Bruh
+ * @version 1.0
+ * @since 2025-05-04
+// */
+
+@ExtendWith(SpringExtension.class)
+@Import(BillingGrpcService.class)
 class BillingGrpcServiceTest {
 
     private BillingGrpcService billingGrpcService;
