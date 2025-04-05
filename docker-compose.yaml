@@ -60,6 +60,25 @@ services:
       retries: 5
       start_period: 15s
 
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - spring-services
+    environment:
+      - KAFKA_KRAFT_MODE=true
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_LOG_DIRS=/bitnami/kafka/data
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+
 networks:
   spring-services:
     driver: bridge

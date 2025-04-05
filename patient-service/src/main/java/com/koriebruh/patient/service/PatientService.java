@@ -4,6 +4,7 @@ import com.koriebruh.patient.dto.PatientRequest;
 import com.koriebruh.patient.dto.PatientResponse;
 import com.koriebruh.patient.entity.Patient;
 import com.koriebruh.patient.grpc.BillingServiceGrpcClient;
+import com.koriebruh.patient.kafka.KafkaProducer;
 import com.koriebruh.patient.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ public class PatientService {
 
     @Autowired
     private BillingServiceGrpcClient billingServiceGrpcClient;
+
+    @Autowired
+    private KafkaProducer kafkaProducer;
 
     public List<PatientResponse> getAllPatients() {
         List<Patient> patients = patientRepository.findAll();
@@ -82,6 +86,7 @@ public class PatientService {
         }
 
         billingServiceGrpcClient.createBillingAccount(patientId, p.getName(), p.getEmail());
+        kafkaProducer.sendEvent(p, "PATIENT_CREATED");
     }
 
     public void updatePatient(Long id, PatientRequest patientRequest) {

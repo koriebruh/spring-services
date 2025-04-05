@@ -17,6 +17,20 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+    topic:
+      patient-domain: patient-events
+
+
+logging:
+  level:
+    root: info
+    web: info
+
 #connect into grpc service
 billing:
   service:
