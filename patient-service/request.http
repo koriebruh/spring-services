@@ -1,0 +1,44 @@
+### CREATE PATIENT
+POST http://localhost:8080/api/patients
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "address": "123 Main St, Springfield, USA",
+  "email": "john.doe@example.com",
+  "dateOfBirth": "1990-05-15",
+  "gender": "Male"
+}
+
+### GET PATIENTS
+GET http://localhost:8080/api/patients
+Accept: application/json
+Content-Type: application/json
+
+### GET PATIENT by ID
+GET http://localhost:8080/api/patients/1
+Accept: application/json
+Content-Type: application/json
+
+### UPDATE PATIENT BY ID
+PUT http://localhost:8080/api/patients/1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Jessica",
+  "address": "123 Main St, Springfield, USA",
+  "email": "jessica.doe@example.com",
+  "dateOfBirth": "1990-05-15",
+  "gender": "Girl"
+}
+
+
+### DELETE PATIENTS
+GET http://localhost:8080/api/patients/1
+Accept: application/json
+Content-Type: application/json
+
+
+

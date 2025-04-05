@@ -1,21 +1,25 @@
 package com.koriebruh.patient.controller;
 
+import billing.BillingResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koriebruh.patient.TestMockConfig;
 import com.koriebruh.patient.dto.ErrorResponse;
 import com.koriebruh.patient.dto.PatientRequest;
 import com.koriebruh.patient.dto.PatientResponse;
 import com.koriebruh.patient.dto.WebResponse;
+import com.koriebruh.patient.grpc.BillingServiceGrpcClient;
 import com.koriebruh.patient.repository.PatientRepository;
 import com.koriebruh.patient.service.PatientService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,9 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestMockConfig.class)
 class PatientControllerTest {
 
-    private static final Logger log = LoggerFactory.getLogger(PatientControllerTest.class);
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,15 +44,20 @@ class PatientControllerTest {
     private PatientRepository patientRepository;
 
     private ObjectMapper objectMapper;
+
     @Autowired
     private PatientService patientService;
 
-    private static final Logger logger = LoggerFactory.getLogger(PatientControllerTest.class);
+    @Autowired
+    private BillingServiceGrpcClient billingServiceGrpcClient;
+
+
 
     @BeforeEach
     void setUp() {
         patientRepository.deleteAll();
         objectMapper = new ObjectMapper();
+        Mockito.reset(billingServiceGrpcClient);
     }
 
     /*
@@ -59,6 +68,7 @@ class PatientControllerTest {
      * */
     @Test
     void testCreatePatientSuccess() throws Exception {
+        // Arrange
         PatientRequest request = new PatientRequest();
         request.setName("testttt");
         request.setAddress("jalan baru jadi");
@@ -66,6 +76,17 @@ class PatientControllerTest {
         request.setGender("MAN");
         request.setEmail("test@test.com");
 
+        // mock response dari gRPC
+        BillingResponse grpcResponse = BillingResponse.newBuilder()
+                .setAccountId(123L)
+                .setStatus("SUCCESS")
+                .build();
+
+        // ketika dipanggil, return grpcResponse
+        Mockito.when(billingServiceGrpcClient.createBillingAccount(Mockito.anyLong(), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(grpcResponse);
+
+        // Act + Assert
         mockMvc.perform(
                 post("/api/patients")
                         .accept(MediaType.APPLICATION_JSON)
@@ -74,11 +95,11 @@ class PatientControllerTest {
         ).andExpect(
                 status().isCreated()
         ).andDo(result -> {
-            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
-            });
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
             Assertions.assertEquals("CREATED", response.getStatus());
         });
     }
+
 
     @Test
     void testCreatePatientDuplicateEmail() throws Exception {

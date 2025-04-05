@@ -3,6 +3,7 @@ package com.koriebruh.patient.service;
 import com.koriebruh.patient.dto.PatientRequest;
 import com.koriebruh.patient.dto.PatientResponse;
 import com.koriebruh.patient.entity.Patient;
+import com.koriebruh.patient.grpc.BillingServiceGrpcClient;
 import com.koriebruh.patient.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,13 @@ import java.util.stream.Collectors;
 public class PatientService {
 
     @Autowired
-    PatientRepository patientRepository;
+    private PatientRepository patientRepository;
 
     @Autowired
     private ValidationService validationService;
+
+    @Autowired
+    private BillingServiceGrpcClient billingServiceGrpcClient;
 
     public List<PatientResponse> getAllPatients() {
         List<Patient> patients = patientRepository.findAll();
@@ -70,6 +74,14 @@ public class PatientService {
         p.setGender(patientRequest.getGender());
         p.setCreatedAt(Instant.now().getEpochSecond());
         patientRepository.save(p);
+
+        Long patientId = p.getId();
+        if (patientId == null) {
+            patientRepository.delete(p);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create patient grpc server die");
+        }
+
+        billingServiceGrpcClient.createBillingAccount(patientId, p.getName(), p.getEmail());
     }
 
     public void updatePatient(Long id, PatientRequest patientRequest) {

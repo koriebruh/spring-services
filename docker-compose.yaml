@@ -31,6 +31,7 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+      - billing-service
     networks:
       - spring-services
     healthcheck:
@@ -50,8 +51,6 @@ services:
     ports:
       - "8081:8081"
       - "9091:9091"
-    depends_on:
-      - patient-service
     networks:
       - spring-services
     healthcheck:

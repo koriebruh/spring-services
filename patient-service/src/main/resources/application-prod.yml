@@ -12,12 +12,19 @@ spring:
       connection-timeout: 5000
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+#connect into grpc service
+billing:
+  service:
+    address: billing-service
+    grpc:
+      port: 9091
 
+# spring patient service
 server:
   port: 8080
 

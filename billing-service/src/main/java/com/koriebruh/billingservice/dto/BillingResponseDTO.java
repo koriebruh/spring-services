@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class BillingResponseDTO {
 
-    private int accountId;
+    private long accountId;
 
     private String status;
 }

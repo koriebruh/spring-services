@@ -18,12 +18,18 @@ public class ErrorController {
                 .body(ErrorResponse.<String>builder().errors(ex.getMessage()).build());
     }
 
-
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse<String>> handleResponseStatusException(ResponseStatusException ex) {
         return ResponseEntity.status(ex.getStatusCode())
                 .body(ErrorResponse.<String>builder().errors(ex.getReason()).build());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse<String>> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.<String>builder()
+                        .errors("An unexpected error occurred: " + ex.getMessage())
+                        .build());
+    }
 
 }
