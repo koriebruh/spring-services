@@ -101,6 +101,28 @@ services:
       retries: 5
       start_period: 15s
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "3000:3000"
+    depends_on:
+      - patient-service
+      - billing-service
+      - analytics-service
+    networks:
+      - spring-services
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
 networks:
   spring-services:
     driver: bridge

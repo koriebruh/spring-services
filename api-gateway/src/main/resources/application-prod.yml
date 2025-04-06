@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: api-gateway
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  cloud:
+    gateway:
+      routes:
+        - id: patient-service-route
+          uri: http://patient-service:8080
+          predicates:
+            - Path=/api/patients/**
+
+        - id: billing-service-route
+          uri: http://billing-service:8081
+          predicates:
+            - Path=/api/billing/**
+#          filters:
+#            - StripPrefix=1
+
+server:
+  port: 3000
+
+logging:
+  level:
+    root: info
+    web: info
+
+info:
+  app:
+    name: Billing Service
+    version: 1.0.0
+  author: koriebruh (JAMAL)
+  website: https://github.com/koriebruh
+  java:
+    version: ${java.version}
+    vendor: ${java.vendor}
+    vm:
+      name: ${java.vm.name}
+      version: ${java.vm.version}
+    runtime:
+      name: ${java.runtime.name}
+  os:
+    name: ${os.name}
+    arch: ${os.arch}
+    version: ${os.version}
+  spring:
+    version: ${spring.boot.version}
+
+management:
+  server:
+    port: 3000
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    env:
+      show-values: never
+    configprops:
+      show-values: never
+  info:
+    env:
+      enabled: false
