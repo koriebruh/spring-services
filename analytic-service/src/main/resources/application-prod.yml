@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: analytic-service
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      group-id: analytic-service
+    topic:
+      we-consume : patient-events
+server:
+  port: 8082
+
+logging:
+  level:
+    root: info
+    web: info
+
+# information about the application
+info:
+  app:
+    name: Analytic Service
+    version: 1.0.0
+  author: koriebruh (JAMAL)
+  website: https://github.com/koriebruh
+  java:
+    version: ${java.version}
+    vendor: ${java.vendor}
+    vm:
+      name: ${java.vm.name}
+      version: ${java.vm.version}
+    runtime:
+      name: ${java.runtime.name}
+  os:
+    name: ${os.name}
+    arch: ${os.arch}
+    version: ${os.version}
+  spring:
+    version: ${spring.boot.version}
+
+management:
+  server:
+    port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    env:
+      show-values: never
+    configprops:
+      show-values: never
+  info:
+    env:
+      enabled: false
