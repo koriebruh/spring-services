@@ -123,6 +123,43 @@ services:
       retries: 5
       start_period: 15s
 
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres-auth
+      - api-gateway
+    networks:
+      - spring-services
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  postgres-auth:
+    image: postgres:17
+    container_name: postgres-auth-service
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: korie123
+      POSTGRES_DB: auth_service
+    networks:
+      - spring-services
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 networks:
   spring-services:
     driver: bridge

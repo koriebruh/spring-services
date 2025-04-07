@@ -1,0 +1,68 @@
+JWT_SECRET: 03dfe95b-e0f6-4673-8afe-f616ce7f6e81
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres-auth:5432/auth_service}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      connection-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+logging:
+  level:
+    root: info
+    web: info
+
+# information about the application
+info:
+  app:
+    name: Auth Service
+    version: 1.0.0
+  author: koriebruh (JAMAL)
+  website: https://github.com/koriebruh
+  java:
+    version: ${java.version}
+    vendor: ${java.vendor}
+    vm:
+      name: ${java.vm.name}
+      version: ${java.vm.version}
+    runtime:
+      name: ${java.runtime.name}
+  os:
+    name: ${os.name}
+    arch: ${os.arch}
+    version: ${os.version}
+  spring:
+    version: ${spring.boot.version}
+
+management:
+  server:
+    port: 8083
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+    env:
+      show-values: never
+    configprops:
+      show-values: never
+  info:
+    env:
+      enabled: false

@@ -6,15 +6,25 @@ spring:
   cloud:
     gateway:
       routes:
+        # in gateway http://localhost:8080/auth/**
+        - id: patient-service-route
+          uri: http://auth-service:8083
+          predicates:
+            - Path=/auth/**
+
         - id: patient-service-route
           uri: http://patient-service:8080
           predicates:
             - Path=/api/patients/**
+          filters:
+            - JwtValidation
 
         - id: billing-service-route
           uri: http://billing-service:8081
           predicates:
             - Path=/api/billing/**
+          filters:
+            - JwtValidation
 #          filters:
 #            - StripPrefix=1
 
@@ -25,6 +35,12 @@ logging:
   level:
     root: info
     web: info
+
+# Add the following line to configure the URL of the Auth Service
+auth:
+  service:
+    url: http://auth-service:8083
+
 
 info:
   app:

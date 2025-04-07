@@ -1,0 +1,26 @@
+### login request to example server
+POST http://localhost:8083/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "admin1234",
+  "password": "admin1234#"
+}
+
+### registration request to example server
+POST http://localhost:8083/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "admin1234",
+  "password": "admin1234#",
+  "email": "admin1234@gmail.com"
+}
+
+### registration request to example server
+GET http://localhost:8083/auth/validate
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NDQwMDc3OTUsImV4cCI6MTc0NDA5NDE5NX0.AoQAoIIb0g6bD4WxMnfAx3hqczaETa6EOVwdzst1P5w
