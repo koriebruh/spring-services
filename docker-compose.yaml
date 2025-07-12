@@ -114,6 +114,7 @@ services:
       - patient-service
       - billing-service
       - analytics-service
+      - auth-service
     networks:
       - spring-services
     healthcheck:
@@ -130,11 +131,12 @@ services:
     container_name: auth-service
     environment:
       SPRING_PROFILES_ACTIVE: prod
+      DB_USER: postgres
+      DB_PASS: korie123
     ports:
       - "8083:8083"
     depends_on:
       - postgres-auth
-      - api-gateway
     networks:
       - spring-services
     healthcheck:

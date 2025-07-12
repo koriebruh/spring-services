@@ -23,4 +23,4 @@ Accept: application/json
 GET http://localhost:8083/auth/validate
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NDQwMDc3OTUsImV4cCI6MTc0NDA5NDE5NX0.AoQAoIIb0g6bD4WxMnfAx3hqczaETa6EOVwdzst1P5w
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzYwNzEsImV4cCI6MTc1MjMzNjk3MX0.fODWUZu5t6GEIknn1f2EI0xoGfXWmAHt5vYrrvYR2xs

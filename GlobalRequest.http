@@ -45,16 +45,21 @@ Content-Type: application/json
 GET http://localhost:3000/api/patients
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
+
 
 ### GET PATIENT by ID
 GET http://localhost:3000/api/patients/1
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
+
 
 ### UPDATE PATIENT BY ID
 PUT http://localhost:3000/api/patients/1
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
 
 {
   "name": "Jessica",
@@ -68,16 +73,21 @@ Content-Type: application/json
 DELETE http://localhost:3000/api/patients/1
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
+
 
 
 ###
 GET http://localhost:3000/api/billing
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
+
 
 ### testing
 POST http://localhost:3000/api/billing
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
 
 {
   "patientId": 1,
@@ -88,6 +98,7 @@ Accept: application/json
 ###
 GRPC localhost:9091/BillingService/CreateBillingAccount
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbjEyMzQiLCJpYXQiOjE3NTIzMzgyNjAsImV4cCI6MTc1MjMzOTE2MH0.TJDpFXyTkuXjuPzkFFVMDwebDiiAUzjRbmqyxB4rk2E
 
 {
   "patientId": 1,
