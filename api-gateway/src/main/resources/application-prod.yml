@@ -31,11 +31,15 @@ auth:
   service:
     url: http://auth-service:8083
 
+#logging:
+#  level:
+#    root: info
+#    web: info
+
 logging:
   level:
-    root: info
-    web: info
-
+    org.springframework.cloud.gateway: DEBUG
+    com.koriebruh.apigateway: DEBUG
 
 info:
   app:
